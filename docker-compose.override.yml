@@ -1,0 +1,9 @@
+services:
+  app:
+    environment:
+      # Use host.docker.internal so the app container can reach services
+      # started on the host (Postgres/MinIO) by docker-compose.local.yml
+      DATABASE_URL: "postgresql://gdlp:gdlp_pass@host.docker.internal:5432/gdlp_dev"
+      NEXT_PUBLIC_MINIO_ENDPOINT: "http://host.docker.internal:9000"
+      MINIO_ROOT_USER: "minio"
+      MINIO_ROOT_PASSWORD: "minio123"
