@@ -1,0 +1,15 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "framework": "nextjs",
+  "env": [
+    {
+      "key": "SUPABASE_SUPABASE_NEXT_PUBLIC_SUPABASE_URL",
+      "value": "@supabase_url"
+    },
+    {
+      "key": "SUPABASE_NEXT_PUBLIC_SUPABASE_ANON_KEY_ANON_KEY",
+      "value": "@supabase_anon_key"
+    }
+  ]
+}

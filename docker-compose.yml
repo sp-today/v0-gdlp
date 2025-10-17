@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - SUPABASE_NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}SUPABASE_NEXT_PUBLIC_SUPABASE_ANON_KEY_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      - SUPABASE_NEXT_PUBLIC_SUPABASE_URL=${SUPABASE_NEXT_PUBLIC_SUPABASE_URL}
+      - SUPABASE_NEXT_PUBLIC_SUPABASE_ANON_KEY=${SUPABASE_NEXT_PUBLIC_SUPABASE_ANON_KEY}
+    depends_on:
+      - postgres
+    networks:
+      - gdlp-network
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=gdlp
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - gdlp-network
+
+volumes:
+  postgres_data:
+
+networks:
+  gdlp-network:
+    driver: bridge
