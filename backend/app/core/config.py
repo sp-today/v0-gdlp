@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     
     # File storage
     WARRANTY_DOCS_PATH: str = "/app/storage/warranty-docs"
+    UPLOAD_DIR: str = "/app/storage/warranty-docs"
     MAX_UPLOAD_SIZE: int = 10 * 1024 * 1024  # 10MB
     
     # CORS

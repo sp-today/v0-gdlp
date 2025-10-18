@@ -24,4 +24,12 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
-next-env.d.ts
+next-env.d.tsbackend/app/__pycache__/
+backend/app/api/v1/__pycache__/
+backend/app/api/v1/endpoints/__pycache__/
+backend/app/core/__pycache__/
+backend/app/db/__pycache__/
+backend/app/db/models/__pycache__/
+backend/app/models/__pycache__/
+backend/app/schemas/__pycache__/
+backend/tests/__pycache__/

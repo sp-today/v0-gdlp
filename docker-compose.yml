@@ -1,32 +1,115 @@
 services:
-  app:
+  frontend:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     ports:
       - "3000:3000"
-    env_file:
-      - .env.local
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+      - NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - gdlp-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - warranty-docs:/app/storage/warranty-docs
+      - /app/__pycache__
+      - /app/.pytest_cache
+    environment:
+      - PROJECT_NAME=GDLP Backend
+      - API_V1_STR=/api/v1
+      - DATABASE_URL=postgresql+asyncpg://gdlp:gdlp_pass@postgres:5432/gdlp_dev
+      - REDIS_URL=redis://redis:6379/0
+      - SUPABASE_URL=http://host.docker.internal:54321
+      - SUPABASE_SERVICE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU
+      - WARRANTY_DOCS_PATH=/app/storage/warranty-docs
+      - MAX_UPLOAD_SIZE=10485760
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - gdlp-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: gdlp
+      POSTGRES_PASSWORD: gdlp_pass
+      POSTGRES_DB: gdlp_dev
+    volumes:
+      - dev-db-data:/var/lib/postgresql/data
+      - ./scripts:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    networks:
+      - gdlp-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gdlp -d gdlp_dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    networks:
+      - gdlp-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@gdlp.dev
+      - PGADMIN_DEFAULT_PASSWORD=admin123
+    ports:
+      - "5050:80"
     depends_on:
       - postgres
     networks:
       - gdlp-network
 
-  postgres:
-    image: postgres:15-alpine
-    environment:
-      - POSTGRES_DB=gdlp
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - gdlp-network
-
 volumes:
-  postgres_data:
+  dev-db-data:
+  redis-data:
+  warranty-docs:
 
 networks:
   gdlp-network:
