@@ -23,11 +23,11 @@ class Settings(BaseSettings):
     ]
     
     @field_validator("BACKEND_CORS_ORIGINS", mode="before")
-    def validate_cors_origins(cls, v: List[str]) -> List[AnyHttpUrl]:
+    def validate_cors_origins(cls, v: List[str] | str) -> List[str]:
         if isinstance(v, str):
             # Handle comma-separated strings from environment variables
-            return [AnyHttpUrl(origin.strip()) for origin in v.split(",")]
-        return [AnyHttpUrl(origin) for origin in v]
+            return [origin.strip() for origin in v.split(",")]
+        return v
     
     model_config = SettingsConfigDict(
         case_sensitive=True,
