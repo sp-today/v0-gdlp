@@ -6,6 +6,11 @@ ROOT_DIR=$(cd "$(dirname "$0")/.." && pwd)
 cd "$ROOT_DIR"
 
 echo "Starting dev compose..."
+if [ -x ./scripts/build-gotrue.sh ]; then
+  echo "Building gotrue local image (if not present)..."
+  ./scripts/build-gotrue.sh || echo "Warning: gotrue build failed or skipped"
+fi
+
 docker compose -f docker-compose.dev.yml up -d --build
 
 echo "Waiting for postgres to accept connections..."
