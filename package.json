@@ -5,9 +5,10 @@
   "scripts": {
     "build": "next build",
     "db:init": "ts-node scripts/init-db.ts",
-    "db:migrate": "ts-node scripts/migrate.ts",
-    "db:seed": "ts-node scripts/seed.ts",
+    "db:migrate": "./scripts/db-migrate.sh",
+    "db:seed": "./scripts/db-seed.sh",
     "dev": "next dev",
+  "supabase:start": "./scripts/supabase-local-start.sh",
     "lint": "next lint",
     "start": "next start",
     "test": "jest",

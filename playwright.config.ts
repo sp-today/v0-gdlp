@@ -7,8 +7,8 @@ export default defineConfig({
   use: {
     headless: true,
     viewport: { width: 1280, height: 800 },
-    actionTimeout: 10_000,
-    baseURL: 'http://host.docker.internal:3000',
+  actionTimeout: 10_000,
+  baseURL: 'http://localhost:3000',
   },
   projects: [
     {

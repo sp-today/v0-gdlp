@@ -42,3 +42,32 @@ Checklist performed by this setup (cross-verify):
 Backups
 - To backup DB: `docker exec -t gdlp-local-db pg_dumpall -c -U $POSTGRES_USER > backup.sql`
 - To restore: `psql -U $POSTGRES_USER -d $POSTGRES_DB -f backup.sql` inside container or from host
+
+## Supabase CLI (recommended for local Supabase Auth)
+
+If you need a real Supabase Auth (gotrue) and the Supabase-managed Postgres for local development, the easiest way is to use the Supabase CLI. This brings up a local Supabase stack including Postgres and gotrue.
+
+1. Install Supabase CLI (macOS example):
+
+```bash
+brew install supabase/tap/supabase
+# or via npm
+npm install -g supabase
+```
+
+2. Start Supabase locally:
+
+```bash
+# from project root
+./scripts/supabase-local-start.sh
+```
+
+3. Once Supabase is running, run the project init which will migrate and seed the database and verify the API:
+
+```bash
+./scripts/init-local.sh
+```
+
+Notes:
+- The CLI stores its local state (migrations, etc.) in the `supabase/` folder when you run `supabase init`.
+- If you prefer to keep everything in Docker Compose, see the `dev/gotrue/README.md` for steps to build a local gotrue image and add it to your compose.
